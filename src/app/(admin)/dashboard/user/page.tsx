@@ -1,6 +1,7 @@
 import UserTable from "@/components/admin/user.table";
 
-const ManageUserPage = () => {
+const ManageUserPage = async () => {
+
     return (
         <div>
             <UserTable />

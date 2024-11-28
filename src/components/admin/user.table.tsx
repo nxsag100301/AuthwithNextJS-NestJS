@@ -1,10 +1,12 @@
 'use client'
-import { Button, Table } from "antd"
+import { Button, Modal, Table } from "antd"
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { sendRequest } from "@/utils/api";
 import ModalEditUser from "./modal.edit.user";
-import ModalDeleteUser from "./modal.delete.user";
+import { actionDeleteUser } from "@/utils/action";
+import { toast } from "react-toastify";
+import ModalCreateUser from "./modal.create.user";
 
 const UserTable = () => {
 
@@ -14,7 +16,7 @@ const UserTable = () => {
     const [totalPages, setTotalPages] = useState<number>(0);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [isModalEditOpen, setIsModalEditOpen] = useState(false);
-    const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+    const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
     const [user, setUser] = useState()
 
     useEffect(() => {
@@ -31,20 +33,50 @@ const UserTable = () => {
                 sort
             },
             url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users`,
+            nextOption: {
+                next: { tags: ['list-users'] }
+            }
         })
         setDataUser(res.data?.results)
         setTotalPages(res.data?.totalPages || 0)
         setTotalItems(res.data?.totalItems || 0)
     }
 
-    const handleDeleteUser = (record: any) => {
-        setIsModalDeleteOpen(true)
-        setUser(record)
-    }
-
     const handleEditUser = (record: any) => {
         setIsModalEditOpen(true)
         setUser(record)
+    }
+
+    const handleEditUserDone = () => {
+        fetchUser(currentPage, pageSize)
+        setIsModalEditOpen(false)
+    }
+
+    const handleCreateUser = () => {
+        setIsModalCreateOpen(true)
+    }
+
+    const handleCreateUserDone = () => {
+        fetchUser(currentPage, pageSize)
+        setIsModalCreateOpen(false)
+    }
+
+    const handleDeleteUser = (record: any) => {
+        Modal.confirm({
+            title: `${record.email}`,
+            content: `Are you sure to delete this user`, okText: 'Confirm',
+            okType: 'danger', cancelText: 'Cancel',
+            async onOk() {
+                let res = await actionDeleteUser(record._id)
+                if (res.errCode === 0) {
+                    toast.success(res?.message)
+                    fetchUser(currentPage, pageSize)
+                }
+                else (
+                    toast.error(res?.message)
+                )
+            }, onCancel() { },
+        })
     }
 
     const columns = [
@@ -94,11 +126,12 @@ const UserTable = () => {
                 isModalEditOpen={isModalEditOpen}
                 setIsModalEditOpen={setIsModalEditOpen}
                 user={user}
+                handleEditUserDone={handleEditUserDone}
             />
-            <ModalDeleteUser
-                isModalDeleteOpen={isModalDeleteOpen}
-                setIsModalDeleteOpen={setIsModalDeleteOpen}
-                user={user}
+            <ModalCreateUser
+                isModalCreateOpen={isModalCreateOpen}
+                setIsModalCreateOpen={setIsModalCreateOpen}
+                handleCreateUserDone={handleCreateUserDone}
             />
             <div style={{
                 display: "flex", justifyContent: "space-between",
@@ -106,11 +139,11 @@ const UserTable = () => {
                 marginBottom: 20
             }}>
                 <span>Manager Users</span>
-                <Button>Create User</Button>
+                <Button onClick={() => handleCreateUser()}>Create User</Button>
             </div>
             <Table
                 bordered
-                dataSource={dataUser}
+                dataSource={dataUser?.map(user => ({ ...user, key: user._id }))}
                 columns={columns}
                 pagination={{
                     current: currentPage,
