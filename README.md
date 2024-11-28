@@ -33,6 +33,15 @@ Forget password:
 ![image](https://github.com/user-attachments/assets/cd4155e6-824a-48e0-909c-9c6bbb530418)
 ![image](https://github.com/user-attachments/assets/b4881813-bea3-4d2a-bd36-f8c8b6d1dd82)
 ![image](https://github.com/user-attachments/assets/65fd3021-6e2a-41a8-b303-c4716d8627d2)
+Create user: 
+![image](https://github.com/user-attachments/assets/c5fa4e7f-4246-4f1b-91b6-0ae5e6b0b2f1)
+Edit user:
+![image](https://github.com/user-attachments/assets/03e9bacb-7c7e-4056-9f00-21fb07c82d13)
+Delete user:
+![image](https://github.com/user-attachments/assets/c06f3a23-1771-4278-9ad7-27a95f0a950c)
+
+
+
 
 
 
